@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Sample</title>
+    <style>
+        #view{
+            padding: 10px;
+            border: 4px solid #6f28bb;
+            width: 50%px;
+            background-color: aliceblue;
+            height:500px;
+            overflow: auto;
+        }
+        img{
+            width:50px;
+        }
+        #view>div{
+            border-bottom: 1px dotted #3838ab;
+            font-size:medium;
+        }
+        .bold{
+            font-weight: bold;
+        }
+        h2{
+            font-size:x-large;
+            color:#f1071e;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>
+           原宿 天気5日間！
+        </h1>
+        <div id="view"></div>
+    </div>
+
+    <script src='https://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=As9A4gB4JEOrJjHl6nq84lsNltpywnNg0E_0ZYbMQpBmLoYDhPpMuRgIt99ZFonT' async defer></script>  
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script>
+        //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+        //MAP表示処理
+        //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+        const key   = "";  //***自分のKEYを！！！！！！！！！！！！！！！***
+        const lat   = "35.670405";
+        const lon   = "139.702499";
+        const icon  = "http://openweathermap.org/img/wn/";
+
+        //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+        //OpenWeatherAPI（天気情報を取得）5DAY/3hour
+        //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+        const url = 'https://api.openweathermap.org/data/2.5/forecast?lat='+lat+'&lon='+lon+'&appid='+key;
+        $.ajax({
+            //OpenWeatherAPIに接続
+            url: url,
+            type: 'get',
+            cache: false,
+            dataType:'json'
+        }).done(function(response) {
+             //通信が成功したとき
+            console.log(response); //確認用
+            let html   = "";
+            const br   = "<br>";
+            const time = ' 00:00:00'; //この時間は強調する！
+            for(let i=0; i<response.list.length; i++){
+                
+                //もしも時間に00:00:00が入っていたら次の日付を強調する
+                if(response.list[i].dt_txt.indexOf(time) != -1){
+                    //文字を置き換え
+                    const str = response.list[i].dt_txt.replace("00:00:00",""); 
+                    html += "<h2>"+str+"</h2>";
+                }
+                //HTML表示文字を作成
+                html += "<div>";
+                html += '<span class="bold">'+response.list[i].dt_txt+'</span>'+br;
+                html += "曇り"+response.list[i].clouds.all+"%"+br;
+                html += '風速'+response.list[i].wind.speed+br;
+                html += '<img src="'+icon+response.list[i].weather[0].icon+'@2x.png">';
+                html += "</div>";
+            }
+            $("#view").append(html);
+        });
+    </script>
+</body>
+</html>
